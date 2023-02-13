@@ -1,14 +1,20 @@
-FROM amazonlinux:latest as dcv
+FROM docker-repo.nibr.novartis.net/amazonlinux:latest as dcv
 
 # Prepare the container to run systemd inside
 ENV container docker
 
-ARG AWS_REGION=eu-west-1
+ARG AWS_REGION=us-east-1
+
+ENV http_proxy=http://nibr-proxy.global.nibr.novartis.net:2011
+ENV https_proxy=http://nibr-proxy.global.nibr.novartis.net:2011
+
+RUN echo "sslverify=false" >> /etc/yum.conf
 
 # Install tools
 RUN yum -y install tar sudo less vim lsof firewalld net-tools pciutils \
-                   file wget kmod xz-utils ca-certificates binutils kbd \
-                   python3-pip bind-utils jq bc
+                   file wget kmod xz-utils ca-certificates binutils kbd bind-utils jq bc
+
+RUN yum -y install python3-pip
 
 # Install awscli and configure region only
 # Note: required to run aws ssm command
